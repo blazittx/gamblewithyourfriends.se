@@ -11,12 +11,17 @@ import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
 import SteamNotification from './components/common/SteamNotification'
+import CoinflipPopup from './components/common/CoinflipPopup'
+import ShopPopup from './components/common/ShopPopup'
 import PrivacyPolicy from './components/pages/PrivacyPolicy'
 import TermsOfService from './components/pages/TermsOfService'
+import { getLastCoinflipTime } from './utils/coins'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
   const [showSteamNotification, setShowSteamNotification] = useState(false)
+  const [showCoinflipPopup, setShowCoinflipPopup] = useState(false)
+  const [showShopPopup, setShowShopPopup] = useState(false)
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -33,6 +38,58 @@ function App() {
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange)
+    }
+  }, [])
+
+  // Show coinflip popup occasionally
+  useEffect(() => {
+    if (currentPage !== 'home') return
+
+    const checkCoinflipPopup = () => {
+      const lastTime = getLastCoinflipTime()
+      const now = Date.now()
+      const timeSinceLastPopup = now - lastTime
+      
+      // Show popup if:
+      // 1. Never shown before (lastTime === 0)
+      // 2. Or at least 2 minutes have passed since last popup
+      // 3. And random chance (30% chance when conditions are met)
+      const shouldShow = lastTime === 0 || timeSinceLastPopup >= 2 * 60 * 1000
+      
+      if (shouldShow && Math.random() < 0.3) {
+        // Small delay to make it feel more natural
+        setTimeout(() => {
+          setShowCoinflipPopup(true)
+        }, 5000 + Math.random() * 10000) // Show between 5-15 seconds after page load
+      }
+    }
+
+    // Check after initial load
+    const initialTimer = setTimeout(checkCoinflipPopup, 5000)
+
+    // Also check periodically (every 3 minutes)
+    const interval = setInterval(() => {
+      checkCoinflipPopup()
+    }, 3 * 60 * 1000)
+
+    return () => {
+      clearTimeout(initialTimer)
+      clearInterval(interval)
+    }
+  }, [currentPage])
+
+  // Keyboard shortcut to manually trigger coinflip (Ctrl+Shift+C or Cmd+Shift+C)
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault()
+        setShowCoinflipPopup(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
     }
   }, [])
 
@@ -134,7 +191,10 @@ function App() {
       </Helmet>
 
       <div className="App">
-        <Navigation showSteamNotification={() => setShowSteamNotification(true)} />
+        <Navigation 
+          showSteamNotification={() => setShowSteamNotification(true)} 
+          onCoinBalanceClick={() => setShowShopPopup(true)}
+        />
         <HeroBanner showSteamNotification={() => setShowSteamNotification(true)} />
         <SteamSection showSteamNotification={() => setShowSteamNotification(true)} />
         <NewsSection />
@@ -146,6 +206,19 @@ function App() {
         {showSteamNotification && (
           <SteamNotification onClose={() => setShowSteamNotification(false)} />
         )}
+        {showCoinflipPopup && (
+          <CoinflipPopup onClose={() => setShowCoinflipPopup(false)} />
+        )}
+        {showShopPopup && (
+          <ShopPopup onClose={() => setShowShopPopup(false)} />
+        )}
+        {/* Hidden button to manually trigger coinflip */}
+        <button
+          className="hidden-coinflip-trigger"
+          onClick={() => setShowCoinflipPopup(true)}
+          aria-label="Trigger coinflip"
+          title="Trigger coinflip (or press Ctrl+Shift+C)"
+        />
       </div>
     </>
   )

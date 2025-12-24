@@ -1,0 +1,234 @@
+.coinflip-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10001;
+  animation: fadeIn 0.3s ease;
+}
+
+.coinflip-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  padding: 3rem;
+  z-index: 10002;
+  animation: fadeIn 0.3s ease;
+}
+
+.coinflip-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.coinflip-close:hover {
+  color: #fff;
+}
+
+.coinflip-content {
+  text-align: center;
+}
+
+.coinflip-choices {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.coinflip-choice {
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.coinflip-choice:hover:not(.disabled) {
+  transform: scale(1.1);
+}
+
+.coinflip-choice.selected {
+  opacity: 1;
+}
+
+.coinflip-choice:not(.selected) {
+  opacity: 0.6;
+}
+
+.coinflip-choice.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.choice-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.choice-text {
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.coinflip-coin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 3rem 0;
+}
+
+.coinflip-coin {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.coinflip-coin:hover:not(.disabled) {
+  transform: scale(1.05);
+}
+
+.coinflip-coin.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coinflip-coin.flipping {
+  animation: coinFlip 1.5s linear;
+  cursor: default;
+}
+
+.coin-image {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  display: block;
+}
+
+.coin-placeholder-image {
+  opacity: 0.5;
+}
+
+.coinflip-result {
+  animation: fadeIn 0.5s ease;
+}
+
+.coinflip-result-coin {
+  margin-bottom: 2rem;
+  animation: coinBounce 0.6s ease;
+}
+
+.coinflip-result-coin .coin-image {
+  width: 220px;
+  height: 220px;
+}
+
+.coinflip-result-text {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.result-success {
+  color: #66c0f4;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.result-fail {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.result-reward {
+  color: #ff6b35;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.coinflip-balance {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  margin-top: 1.5rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes coinFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(1440deg);
+  }
+}
+
+@keyframes coinBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .coinflip-popup {
+    padding: 2rem;
+  }
+
+  .coinflip-choices {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .choice-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .coin-image {
+    width: 160px;
+    height: 160px;
+  }
+
+  .coinflip-result-coin .coin-image {
+    width: 180px;
+    height: 180px;
+  }
+}
+
