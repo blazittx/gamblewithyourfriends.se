@@ -86,9 +86,8 @@
 
 @media (max-width: 768px) {
   .hero-banner {
-    height: 90vh;
+    height: 100svh;
     min-height: 500px;
-    margin-top: 55px;
   }
 
   .hero-content {
