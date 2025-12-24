@@ -121,7 +121,10 @@ function App() {
         <meta property="og:url" content="https://gamblewithyourfriends.se/" />
         <meta property="og:title" content="Gamble With Your Friends - World's First Online Co-op Casino Crawler" />
         <meta property="og:description" content="World's first online co-op casino crawler! Play with up to 4 friends, explore procedurally generated casino floors, and take down an evil gambling empire." />
-        <meta property="og:image" content="https://gamblewithyourfriends.se/og-image.jpg" />
+        <meta property="og:image" content="https://gamblewithyourfriends.se/Preview.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/png" />
         <meta property="og:site_name" content="Gamble With Your Friends" />
 
         {/* Twitter */}
@@ -129,7 +132,7 @@ function App() {
         <meta property="twitter:url" content="https://gamblewithyourfriends.se/" />
         <meta property="twitter:title" content="Gamble With Your Friends - World's First Online Co-op Casino Crawler" />
         <meta property="twitter:description" content="World's first online co-op casino crawler! Play with up to 4 friends, explore procedurally generated casino floors, and take down an evil gambling empire." />
-        <meta property="twitter:image" content="https://gamblewithyourfriends.se/og-image.jpg" />
+        <meta property="twitter:image" content="https://gamblewithyourfriends.se/Preview.png" />
 
         {/* Game-Specific Meta */}
         <meta name="game:developer" content="TENSTACK AB" />
