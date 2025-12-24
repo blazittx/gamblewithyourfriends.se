@@ -52,25 +52,25 @@ function App() {
       
       // Show popup if:
       // 1. Never shown before (lastTime === 0)
-      // 2. Or at least 2 minutes have passed since last popup
-      // 3. And random chance (30% chance when conditions are met)
-      const shouldShow = lastTime === 0 || timeSinceLastPopup >= 2 * 60 * 1000
+      // 2. Or at least 15 seconds have passed since last popup
+      // 3. And random chance (70% chance when conditions are met)
+      const shouldShow = lastTime === 0 || timeSinceLastPopup >= 15 * 1000
       
-      if (shouldShow && Math.random() < 0.3) {
+      if (shouldShow && Math.random() < 0.7) {
         // Small delay to make it feel more natural
         setTimeout(() => {
           setShowCoinflipPopup(true)
-        }, 5000 + Math.random() * 10000) // Show between 5-15 seconds after page load
+        }, 2000 + Math.random() * 3000) // Show between 2-5 seconds after page load
       }
     }
 
     // Check after initial load
-    const initialTimer = setTimeout(checkCoinflipPopup, 5000)
+    const initialTimer = setTimeout(checkCoinflipPopup, 2000)
 
-    // Also check periodically (every 3 minutes)
+    // Also check periodically (every 30 seconds)
     const interval = setInterval(() => {
       checkCoinflipPopup()
-    }, 3 * 60 * 1000)
+    }, 30 * 1000)
 
     return () => {
       clearTimeout(initialTimer)
