@@ -10,11 +10,13 @@ import FAQSection from './components/FAQSection/FAQSection'
 import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
+import SteamNotification from './components/common/SteamNotification'
 import PrivacyPolicy from './components/pages/PrivacyPolicy'
 import TermsOfService from './components/pages/TermsOfService'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
+  const [showSteamNotification, setShowSteamNotification] = useState(false)
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -84,15 +86,18 @@ function App() {
       </Helmet>
 
       <div className="App">
-        <Navigation />
-        <HeroBanner />
-        <SteamSection />
+        <Navigation showSteamNotification={() => setShowSteamNotification(true)} />
+        <HeroBanner showSteamNotification={() => setShowSteamNotification(true)} />
+        <SteamSection showSteamNotification={() => setShowSteamNotification(true)} />
         <NewsSection />
         <TrailersSection />
         <FAQSection />
         <Footer />
         <BackToTop />
         <CookieConsent />
+        {showSteamNotification && (
+          <SteamNotification onClose={() => setShowSteamNotification(false)} />
+        )}
       </div>
     </>
   )

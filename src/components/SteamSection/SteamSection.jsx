@@ -1,10 +1,8 @@
 import "./SteamSection.css";
 import Button from "../common/Button";
+import { openSteamStore } from "../../utils/steam";
 
-const SteamSection = () => {
-  const STEAM_APP_ID = "3892270";
-  const STEAM_STORE_URL = `https://store.steampowered.com/app/${STEAM_APP_ID}`;
-
+const SteamSection = ({ showSteamNotification }) => {
   return (
     <section id="steam" className="steam-section">
       <div className="steam-container">
@@ -18,9 +16,7 @@ const SteamSection = () => {
               Get the game on Steam, connect with the community, and start your gaming adventure today.
             </p>
             <Button
-              href={STEAM_STORE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => openSteamStore('3892270', showSteamNotification)}
               variant="primary"
             >
               Wishlist on

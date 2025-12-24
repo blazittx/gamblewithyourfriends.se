@@ -1,0 +1,46 @@
+.steam-notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.steam-notification {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 6px;
+  max-width: 800px;
+  width: auto;
+  white-space: nowrap;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .steam-notification {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+    white-space: normal;
+    max-width: 90%;
+  }
+}
+
