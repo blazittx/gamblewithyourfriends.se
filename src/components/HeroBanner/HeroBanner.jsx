@@ -26,7 +26,19 @@ const HeroBanner = ({ showSteamNotification }) => {
               </svg>
               
             </Button>
-            <Button href="#trailer" variant="secondary">Watch Trailer</Button>
+            <Button 
+              href="#trailers" 
+              variant="secondary"
+              onClick={(e) => {
+                e.preventDefault()
+                const element = document.getElementById('trailers')
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              }}
+            >
+              Watch Trailer
+            </Button>
           </div>
         </div>
       </div>

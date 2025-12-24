@@ -94,6 +94,19 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+.video-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.trailer-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #000;
+}
+
 .video-thumbnail {
   width: 100%;
   height: 100%;
@@ -146,16 +159,27 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .play-button-large:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.6));
+}
+
+.play-button-large:hover .play-button-circle {
+  fill: rgba(0, 0, 0, 0.75);
 }
 
 .play-button-large:active {
-  transform: scale(1.05);
+  transform: scale(1.08);
+}
+
+.play-button-large svg {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .video-info-overlay {
@@ -166,6 +190,50 @@
   background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
   padding: 2.5rem 2rem;
   z-index: 3;
+  pointer-events: none;
+}
+
+.video-info-overlay .video-info {
+  pointer-events: auto;
+}
+
+.video-info-below {
+  margin-top: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.video-info-below .video-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.video-info-below .video-title-main {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.video-info-below .video-title-game {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.4;
+}
+
+.video-info-below .video-logo-wrapper {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
 }
 
 .video-info {
@@ -190,6 +258,13 @@
   font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.05em;
+}
+
+.video-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
 }
 
 .video-title-wrapper {
@@ -295,7 +370,7 @@
   }
 
   .play-button-large svg {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
   }
 }
