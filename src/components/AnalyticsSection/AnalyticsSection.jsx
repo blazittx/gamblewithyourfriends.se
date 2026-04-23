@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './AnalyticsSection.css'
 
-const API_URL = import.meta.env.VITE_ANALYTICS_API_URL || '/api/gameAnalytics'
+const API_URL = 'https://api.diabolical.studio/rest-api/gameAnalytics'
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000
 const PAGE_SIZE = 500
 const MAX_PAGES = 40
