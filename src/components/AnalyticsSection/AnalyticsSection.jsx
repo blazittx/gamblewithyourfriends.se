@@ -44,15 +44,37 @@ const calculateStats = (rows) => {
   const betsLast24Hours = dailyRows.length
   const dailyWins = dailyRows.filter((row) => row.is_win === 1).length
   const averageWinRate = betsLast24Hours ? (dailyWins / betsLast24Hours) * 100 : 0
+  const totalWagered = dailyRows.reduce((sum, row) => sum + parseMoneyToCents(row.bet_amount), 0n)
+  const totalProfit = dailyRows.reduce((sum, row) => sum + parseMoneyToCents(row.profit_loss), 0n)
+  const averageBetSize = betsLast24Hours ? totalWagered / BigInt(betsLast24Hours) : 0n
 
   const playerProfits = dailyRows.reduce((acc, row) => {
     const player = row.player_name || 'Unknown'
     acc[player] = (acc[player] || 0n) + parseMoneyToCents(row.profit_loss)
     return acc
   }, {})
+
+  const playerBets = dailyRows.reduce((acc, row) => {
+    const player = row.player_name || 'Unknown'
+    acc[player] = (acc[player] || 0) + 1
+    return acc
+  }, {})
+
+  const playerWins = dailyRows.reduce((acc, row) => {
+    const player = row.player_name || 'Unknown'
+    acc[player] = (acc[player] || 0) + (row.is_win === 1 ? 1 : 0)
+    return acc
+  }, {})
+
   const gameProfits = dailyRows.reduce((acc, row) => {
     const game = row.sub_game_name || 'Unknown'
     acc[game] = (acc[game] || 0n) + parseMoneyToCents(row.profit_loss)
+    return acc
+  }, {})
+
+  const gameVolume = dailyRows.reduce((acc, row) => {
+    const game = row.sub_game_name || 'Unknown'
+    acc[game] = (acc[game] || 0) + 1
     return acc
   }, {})
 
@@ -82,12 +104,42 @@ const calculateStats = (rows) => {
     }
   }
 
+  let mostActivePlayer = null
+  for (const [player, bets] of Object.entries(playerBets)) {
+    if (!mostActivePlayer || bets > mostActivePlayer.bets) {
+      mostActivePlayer = { player, bets }
+    }
+  }
+
+  let hottestPlayer = null
+  for (const [player, bets] of Object.entries(playerBets)) {
+    if (bets < 10) continue
+    const wins = playerWins[player] || 0
+    const winRate = (wins / bets) * 100
+    if (!hottestPlayer || winRate > hottestPlayer.winRate) {
+      hottestPlayer = { player, winRate, bets }
+    }
+  }
+
+  let mostPlayedGame = null
+  for (const [game, bets] of Object.entries(gameVolume)) {
+    if (!mostPlayedGame || bets > mostPlayedGame.bets) {
+      mostPlayedGame = { game, bets }
+    }
+  }
+
   return {
     betsLast24Hours,
     averageWinRate,
+    totalWagered,
+    totalProfit,
+    averageBetSize,
     mostProfitablePlayer,
     mostProfitableGame,
-    biggestSingleWin
+    biggestSingleWin,
+    mostActivePlayer,
+    hottestPlayer,
+    mostPlayedGame
   }
 }
 
@@ -158,17 +210,32 @@ const AnalyticsSection = () => {
           <p className="analytics-status">{error}</p>
         ) : (
           <div className="analytics-grid analytics-grid--bento">
-            <article className="analytics-card analytics-card--hero">
-              <span className="analytics-label">Bets in Last 24 Hours</span>
+            <article className="analytics-card analytics-card--span-4 analytics-card--emphasis">
+              <span className="analytics-label">Total Bets (24H)</span>
               <strong>{formatNumber(stats.betsLast24Hours)}</strong>
             </article>
 
-            <article className="analytics-card">
-              <span className="analytics-label">Average Win Rate</span>
+            <article className="analytics-card analytics-card--span-4">
+              <span className="analytics-label">Total Wagered</span>
+              <strong>{formatCurrencyFromCents(stats.totalWagered)}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-4">
+              <span className="analytics-label">House Net (24H)</span>
+              <strong>{formatCurrencyFromCents(stats.totalProfit)}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-3">
+              <span className="analytics-label">Average Win Rate (24H)</span>
               <strong>{formatPercent(stats.averageWinRate)}</strong>
             </article>
 
-            <article className="analytics-card">
+            <article className="analytics-card analytics-card--span-3">
+              <span className="analytics-label">Average Bet Size</span>
+              <strong>{formatCurrencyFromCents(stats.averageBetSize)}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-3">
               <span className="analytics-label">Most Profitable Game</span>
               <strong>
                 {stats.mostProfitableGame
@@ -177,8 +244,13 @@ const AnalyticsSection = () => {
               </strong>
             </article>
 
-            <article className="analytics-card analytics-card--wide">
-              <span className="analytics-label">Biggest Single Win (Last 24 Hours)</span>
+            <article className="analytics-card analytics-card--span-3">
+              <span className="analytics-label">Most Played Game</span>
+              <strong>{stats.mostPlayedGame ? `${stats.mostPlayedGame.game} (${formatNumber(stats.mostPlayedGame.bets)} bets)` : 'No daily data yet'}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-6">
+              <span className="analytics-label">Biggest Single Win (24H)</span>
               <strong>
                 {stats.biggestSingleWin
                   ? `${formatCurrencyFromCents(stats.biggestSingleWin.amount)} by ${stats.biggestSingleWin.player} in ${stats.biggestSingleWin.game}`
@@ -186,8 +258,18 @@ const AnalyticsSection = () => {
               </strong>
             </article>
 
-            <article className="analytics-card analytics-card--wide">
-              <span className="analytics-label">Most Profitable Player Today</span>
+            <article className="analytics-card analytics-card--span-3">
+              <span className="analytics-label">Most Active Player</span>
+              <strong>{stats.mostActivePlayer ? `${stats.mostActivePlayer.player} (${formatNumber(stats.mostActivePlayer.bets)} bets)` : 'No daily data yet'}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-3">
+              <span className="analytics-label">Hottest Player (Min 10 Bets)</span>
+              <strong>{stats.hottestPlayer ? `${stats.hottestPlayer.player} (${formatPercent(stats.hottestPlayer.winRate)})` : 'No qualifying player yet'}</strong>
+            </article>
+
+            <article className="analytics-card analytics-card--span-6">
+              <span className="analytics-label">Top Profit Player (24H)</span>
               <strong>
                 {stats.mostProfitablePlayer
                   ? `${stats.mostProfitablePlayer.player} (${formatCurrencyFromCents(stats.mostProfitablePlayer.profit)})`

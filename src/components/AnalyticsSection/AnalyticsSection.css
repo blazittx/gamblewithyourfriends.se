@@ -24,6 +24,7 @@
 
 .analytics-grid--bento {
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
 }
 
 .analytics-card {
@@ -31,42 +32,49 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 18px;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  grid-column: span 3;
+  gap: 6px;
+  justify-content: flex-start;
+  grid-column: span 4;
 }
 
 .analytics-card strong {
   color: #fff;
   display: block;
-  font-size: clamp(1.2rem, 2vw, 1.6rem);
-  line-height: 1.2;
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .analytics-label {
   display: block;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
   font-size: 0.85rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.analytics-card--wide {
+.analytics-card--span-3 {
+  grid-column: span 3;
+}
+
+.analytics-card--span-4 {
+  grid-column: span 4;
+}
+
+.analytics-card--span-6 {
   grid-column: span 6;
 }
 
-.analytics-card--hero {
-  grid-column: span 6;
-  min-height: 180px;
+.analytics-card--emphasis {
   background: linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
   border-color: rgba(255, 255, 255, 0.26);
 }
 
-.analytics-card--hero strong {
-  font-size: clamp(2rem, 4vw, 3rem);
+.analytics-card--emphasis strong {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  line-height: 1.1;
 }
 
 .analytics-status {
@@ -85,13 +93,13 @@
   }
 
   .analytics-card,
-  .analytics-card--hero,
-  .analytics-card--wide {
+  .analytics-card--span-3,
+  .analytics-card--span-4,
+  .analytics-card--span-6 {
     grid-column: auto;
-    min-height: auto;
   }
 
-  .analytics-card--hero strong {
+  .analytics-card--emphasis strong {
     font-size: 2rem;
   }
 }
