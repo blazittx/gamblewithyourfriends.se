@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import './App.css'
 import Navigation from './components/common/Navigation'
 import HeroBanner from './components/HeroBanner/HeroBanner'
+import AnalyticsSection from './components/AnalyticsSection/AnalyticsSection'
 import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
@@ -133,6 +134,7 @@ function App() {
       <div className="App">
         <Navigation />
         <HeroBanner />
+        <AnalyticsSection />
         <Footer />
         <BackToTop />
         <CookieConsent />
