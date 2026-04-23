@@ -47,7 +47,7 @@
 }
 
 .cookie-consent-links a {
-  color: #66c0f4;
+  color: #45c8f2;
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -111,7 +111,7 @@
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #66c0f4;
+  accent-color: #45c8f2;
 }
 
 .cookie-toggle input[type="checkbox"]:disabled {

@@ -19,7 +19,7 @@ const SteamSection = ({ showSteamNotification }) => {
               onClick={() => openSteamStore('3892270', showSteamNotification)}
               variant="primary"
             >
-              Wishlist on
+              Purchase
               <svg
                 width="24"
                 height="24"

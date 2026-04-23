@@ -3,25 +3,14 @@ import { Helmet } from 'react-helmet-async'
 import './App.css'
 import Navigation from './components/common/Navigation'
 import HeroBanner from './components/HeroBanner/HeroBanner'
-import SteamSection from './components/SteamSection/SteamSection'
-import NewsSection from './components/NewsSection/NewsSection'
-import TrailersSection from './components/TrailersSection/TrailersSection'
-import FAQSection from './components/FAQSection/FAQSection'
 import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
-import SteamNotification from './components/common/SteamNotification'
-import CoinflipPopup from './components/common/CoinflipPopup'
-import ShopPopup from './components/common/ShopPopup'
 import PrivacyPolicy from './components/pages/PrivacyPolicy'
 import TermsOfService from './components/pages/TermsOfService'
-import { getLastCoinflipTime } from './utils/coins'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
-  const [showSteamNotification, setShowSteamNotification] = useState(false)
-  const [showCoinflipPopup, setShowCoinflipPopup] = useState(false)
-  const [showShopPopup, setShowShopPopup] = useState(false)
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -38,58 +27,6 @@ function App() {
 
     return () => {
       window.removeEventListener('hashchange', handleHashChange)
-    }
-  }, [])
-
-  // Show coinflip popup occasionally
-  useEffect(() => {
-    if (currentPage !== 'home') return
-
-    const checkCoinflipPopup = () => {
-      const lastTime = getLastCoinflipTime()
-      const now = Date.now()
-      const timeSinceLastPopup = now - lastTime
-      
-      // Show popup if:
-      // 1. Never shown before (lastTime === 0)
-      // 2. Or at least 15 seconds have passed since last popup
-      // 3. And random chance (70% chance when conditions are met)
-      const shouldShow = lastTime === 0 || timeSinceLastPopup >= 15 * 1000
-      
-      if (shouldShow && Math.random() < 0.7) {
-        // Small delay to make it feel more natural
-        setTimeout(() => {
-          setShowCoinflipPopup(true)
-        }, 2000 + Math.random() * 3000) // Show between 2-5 seconds after page load
-      }
-    }
-
-    // Check after initial load
-    const initialTimer = setTimeout(checkCoinflipPopup, 2000)
-
-    // Also check periodically (every 30 seconds)
-    const interval = setInterval(() => {
-      checkCoinflipPopup()
-    }, 30 * 1000)
-
-    return () => {
-      clearTimeout(initialTimer)
-      clearInterval(interval)
-    }
-  }, [currentPage])
-
-  // Keyboard shortcut to manually trigger coinflip (Ctrl+Shift+C or Cmd+Shift+C)
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
-        e.preventDefault()
-        setShowCoinflipPopup(true)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
     }
   }, [])
 
@@ -194,34 +131,11 @@ function App() {
       </Helmet>
 
       <div className="App">
-        <Navigation 
-          showSteamNotification={() => setShowSteamNotification(true)} 
-          onCoinBalanceClick={() => setShowShopPopup(true)}
-        />
-        <HeroBanner showSteamNotification={() => setShowSteamNotification(true)} />
-        <SteamSection showSteamNotification={() => setShowSteamNotification(true)} />
-        <NewsSection />
-        <TrailersSection />
-        <FAQSection />
+        <Navigation />
+        <HeroBanner />
         <Footer />
         <BackToTop />
         <CookieConsent />
-        {showSteamNotification && (
-          <SteamNotification onClose={() => setShowSteamNotification(false)} />
-        )}
-        {showCoinflipPopup && (
-          <CoinflipPopup onClose={() => setShowCoinflipPopup(false)} />
-        )}
-        {showShopPopup && (
-          <ShopPopup onClose={() => setShowShopPopup(false)} />
-        )}
-        {/* Hidden button to manually trigger coinflip */}
-        <button
-          className="hidden-coinflip-trigger"
-          onClick={() => setShowCoinflipPopup(true)}
-          aria-label="Trigger coinflip"
-          title="Trigger coinflip (or press Ctrl+Shift+C)"
-        />
       </div>
     </>
   )

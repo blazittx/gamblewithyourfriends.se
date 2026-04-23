@@ -9,7 +9,7 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-radius: 6px;
+  border-radius: 50px;
   font-family: inherit;
   line-height: 1.5;
   text-align: center;
@@ -36,12 +36,12 @@
 }
 
 .btn-accent {
-  background: #ff6b35;
+  background: rgb(74, 218, 255);
   color: #000;
 }
 
 .btn-accent:hover {
-  background: #ff8555;
+  background: rgb(54, 198, 235);
 }
 
 .btn-dark {
