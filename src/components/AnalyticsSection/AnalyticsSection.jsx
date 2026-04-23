@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import './AnalyticsSection.css'
 
-const API_URL = 'https://api.diabolical.studio/rest-api/gameAnalytics'
+const API_URL = import.meta.env.VITE_ANALYTICS_API_URL || '/api/gameAnalytics'
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000
+const PAGE_SIZE = 500
+const MAX_PAGES = 40
 
 const formatNumber = (value, digits = 0) => {
   return Number(value).toLocaleString('en-US', {
@@ -11,17 +13,46 @@ const formatNumber = (value, digits = 0) => {
   })
 }
 
-const calculateStats = (rows) => {
-  const totalRounds = rows.length
-  const totalWins = rows.filter((row) => row.is_win === 1).length
-  const totalProfit = rows.reduce((sum, row) => sum + Number(row.profit_loss || 0), 0)
-  const winRate = totalRounds ? (totalWins / totalRounds) * 100 : 0
+const formatPercent = (value) => `${formatNumber(value, 1)}%`
 
+const parseMoneyToCents = (value) => {
+  const source = String(value ?? '0').trim()
+  if (!source) return 0n
+
+  const isNegative = source.startsWith('-')
+  const unsigned = isNegative ? source.slice(1) : source
+  const [wholeRaw = '0', decimalRaw = ''] = unsigned.split('.')
+  const whole = wholeRaw.replace(/\D/g, '') || '0'
+  const decimal = (decimalRaw.replace(/\D/g, '') + '00').slice(0, 2)
+  const cents = BigInt(whole) * 100n + BigInt(decimal)
+
+  return isNegative ? -cents : cents
+}
+
+const formatCurrencyFromCents = (cents) => {
+  const isNegative = cents < 0n
+  const absolute = isNegative ? -cents : cents
+  const whole = absolute / 100n
+  const decimal = (absolute % 100n).toString().padStart(2, '0')
+  const wholeWithCommas = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return `${isNegative ? '-' : ''}$${wholeWithCommas}.${decimal}`
+}
+
+const calculateStats = (rows) => {
   const weekThreshold = Date.now() - WEEK_IN_MS
   const weeklyRows = rows.filter((row) => new Date(row.created_at).getTime() >= weekThreshold)
+  const betsLast7Days = weeklyRows.length
+  const weeklyWins = weeklyRows.filter((row) => row.is_win === 1).length
+  const averageWinRate = betsLast7Days ? (weeklyWins / betsLast7Days) * 100 : 0
+
   const playerProfits = weeklyRows.reduce((acc, row) => {
     const player = row.player_name || 'Unknown'
-    acc[player] = (acc[player] || 0) + Number(row.profit_loss || 0)
+    acc[player] = (acc[player] || 0n) + parseMoneyToCents(row.profit_loss)
+    return acc
+  }, {})
+  const gameProfits = weeklyRows.reduce((acc, row) => {
+    const game = row.sub_game_name || 'Unknown'
+    acc[game] = (acc[game] || 0n) + parseMoneyToCents(row.profit_loss)
     return acc
   }, {})
 
@@ -32,12 +63,31 @@ const calculateStats = (rows) => {
     }
   }
 
+  let mostProfitableGame = null
+  for (const [game, profit] of Object.entries(gameProfits)) {
+    if (!mostProfitableGame || profit > mostProfitableGame.profit) {
+      mostProfitableGame = { game, profit }
+    }
+  }
+
+  let biggestSingleWin = null
+  for (const row of weeklyRows) {
+    const winAmount = parseMoneyToCents(row.win_amount)
+    if (!biggestSingleWin || winAmount > biggestSingleWin.amount) {
+      biggestSingleWin = {
+        amount: winAmount,
+        player: row.player_name || 'Unknown',
+        game: row.sub_game_name || 'Unknown'
+      }
+    }
+  }
+
   return {
-    totalRounds,
-    totalWins,
-    winRate,
-    totalProfit,
-    mostProfitablePlayer
+    betsLast7Days,
+    averageWinRate,
+    mostProfitablePlayer,
+    mostProfitableGame,
+    biggestSingleWin
   }
 }
 
@@ -49,15 +99,39 @@ const AnalyticsSection = () => {
   useEffect(() => {
     const controller = new AbortController()
 
-    const fetchAnalytics = async () => {
-      try {
-        const response = await fetch(API_URL, { signal: controller.signal })
+    const buildPageUrl = (offset) => {
+      const separator = API_URL.includes('?') ? '&' : '?'
+      return `${API_URL}${separator}limit=${PAGE_SIZE}&offset=${offset}`
+    }
+
+    const fetchAllAnalyticsRows = async () => {
+      let offset = 0
+      let allRows = []
+
+      for (let page = 0; page < MAX_PAGES; page += 1) {
+        const response = await fetch(buildPageUrl(offset), { signal: controller.signal })
         if (!response.ok) {
           throw new Error('Failed to load analytics')
         }
 
         const payload = await response.json()
-        setRows(Array.isArray(payload.data) ? payload.data : [])
+        const pageRows = Array.isArray(payload.data) ? payload.data : []
+        allRows = allRows.concat(pageRows)
+
+        if (pageRows.length < PAGE_SIZE) {
+          break
+        }
+
+        offset += PAGE_SIZE
+      }
+
+      return allRows
+    }
+
+    const fetchAnalytics = async () => {
+      try {
+        const allRows = await fetchAllAnalyticsRows()
+        setRows(allRows)
       } catch (err) {
         if (err.name !== 'AbortError') {
           setError('Could not load game analytics right now.')
@@ -83,32 +157,40 @@ const AnalyticsSection = () => {
         ) : error ? (
           <p className="analytics-status">{error}</p>
         ) : (
-          <div className="analytics-grid">
-            <article className="analytics-card">
-              <span className="analytics-label">Total Rounds</span>
-              <strong>{formatNumber(stats.totalRounds)}</strong>
+          <div className="analytics-grid analytics-grid--bento">
+            <article className="analytics-card analytics-card--hero">
+              <span className="analytics-label">Bets in Last 7 Days</span>
+              <strong>{formatNumber(stats.betsLast7Days)}</strong>
             </article>
 
             <article className="analytics-card">
-              <span className="analytics-label">Total Wins</span>
-              <strong>{formatNumber(stats.totalWins)}</strong>
+              <span className="analytics-label">Average Win Rate</span>
+              <strong>{formatPercent(stats.averageWinRate)}</strong>
             </article>
 
             <article className="analytics-card">
-              <span className="analytics-label">Win Percentage</span>
-              <strong>{formatNumber(stats.winRate, 1)}%</strong>
+              <span className="analytics-label">Most Profitable Game</span>
+              <strong>
+                {stats.mostProfitableGame
+                  ? `${stats.mostProfitableGame.game} (${formatCurrencyFromCents(stats.mostProfitableGame.profit)})`
+                  : 'No weekly data yet'}
+              </strong>
             </article>
 
-            <article className="analytics-card">
-              <span className="analytics-label">Net Profit (Tracked)</span>
-              <strong>{formatNumber(stats.totalProfit, 2)}</strong>
+            <article className="analytics-card analytics-card--wide">
+              <span className="analytics-label">Biggest Single Win (Last 7 Days)</span>
+              <strong>
+                {stats.biggestSingleWin
+                  ? `${formatCurrencyFromCents(stats.biggestSingleWin.amount)} by ${stats.biggestSingleWin.player} in ${stats.biggestSingleWin.game}`
+                  : 'No weekly data yet'}
+              </strong>
             </article>
 
             <article className="analytics-card analytics-card--wide">
               <span className="analytics-label">Most Profitable Player This Week</span>
               <strong>
                 {stats.mostProfitablePlayer
-                  ? `${stats.mostProfitablePlayer.player} (${formatNumber(stats.mostProfitablePlayer.profit, 2)})`
+                  ? `${stats.mostProfitablePlayer.player} (${formatCurrencyFromCents(stats.mostProfitablePlayer.profit)})`
                   : 'No weekly data yet'}
               </strong>
             </article>
