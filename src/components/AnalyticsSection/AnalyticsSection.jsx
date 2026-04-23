@@ -73,7 +73,7 @@ const calculateStats = (rows) => {
       if (a[1] === b[1]) return 0
       return a[1] > b[1] ? -1 : 1
     })
-    .slice(0, 5)
+    .slice(0, 10)
     .map(([player, profit], index) => ({
       rank: index + 1,
       player,
@@ -102,6 +102,7 @@ const AnalyticsSection = () => {
   const [rows, setRows] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -139,6 +140,7 @@ const AnalyticsSection = () => {
       try {
         const allRows = await fetchAllAnalyticsRows()
         setRows(allRows)
+        setError('')
       } catch (err) {
         if (err.name !== 'AbortError') {
           setError('Could not load game analytics right now.')
@@ -149,89 +151,103 @@ const AnalyticsSection = () => {
     }
 
     fetchAnalytics()
-    return () => controller.abort()
+
+    return () => {
+      controller.abort()
+    }
   }, [])
 
   const stats = useMemo(() => calculateStats(rows), [rows])
 
   return (
-    <section className="analytics-section" id="live-stats">
-      <div className="analytics-inner">
-        <h2>Live Analytics</h2>
+    <div className={`analytics-drawer ${isOpen ? 'is-open' : ''}`}>
+      <button
+        type="button"
+        className="analytics-pull-tab"
+        aria-expanded={isOpen}
+        aria-controls="analytics-panel"
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <span className="analytics-pull-tab-label">Analytics</span>
+        <span className="analytics-pull-tab-arrow">{isOpen ? '\u203a' : '\u2039'}</span>
+      </button>
 
-        {isLoading ? (
-          <p className="analytics-status">Loading latest game data...</p>
-        ) : error ? (
-          <p className="analytics-status">{error}</p>
-        ) : (
-          <div className="analytics-layout">
-            <div className="analytics-main">
-              <div className="analytics-grid">
-                <article className="analytics-card">
-                  <span className="analytics-label">Total Bets (24H)</span>
-                  <strong>{formatNumber(stats.betsLast24Hours)}</strong>
-                </article>
+      <section className="analytics-panel" id="analytics-panel">
+        <div className="analytics-inner">
+          {isLoading ? (
+            <p className="analytics-status">Loading latest game data...</p>
+          ) : error ? (
+            <p className="analytics-status">{error}</p>
+          ) : (
+            <div className="analytics-layout">
+              <div className="analytics-main">
+                <div className="analytics-grid">
+                  <article className="analytics-card">
+                    <span className="analytics-label">Total Bets (7D)</span>
+                    <strong>{formatNumber(stats.betsLast24Hours)}</strong>
+                  </article>
 
-                <article className="analytics-card">
-                  <span className="analytics-label">Total Wagered</span>
-                  <strong>{formatCurrencyFromCents(stats.totalWagered)}</strong>
-                </article>
+                  <article className="analytics-card">
+                    <span className="analytics-label">Total Wagered</span>
+                    <strong>{formatCurrencyFromCents(stats.totalWagered)}</strong>
+                  </article>
 
-                <article className="analytics-card">
-                  <span className="analytics-label">House Net (24H)</span>
-                  <strong>{formatCurrencyFromCents(stats.totalProfit)}</strong>
-                </article>
+                  <article className="analytics-card">
+                    <span className="analytics-label">House Net (7D)</span>
+                    <strong>{formatCurrencyFromCents(stats.totalProfit)}</strong>
+                  </article>
 
-                <article className="analytics-card">
-                  <span className="analytics-label">Average Win Rate (24H)</span>
-                  <strong>{formatPercent(stats.averageWinRate)}</strong>
-                </article>
+                  <article className="analytics-card">
+                    <span className="analytics-label">Average Win Rate (7D)</span>
+                    <strong>{formatPercent(stats.averageWinRate)}</strong>
+                  </article>
 
-                <article className="analytics-card">
-                  <span className="analytics-label">Most Profitable Game</span>
-                  <strong>
-                    {stats.mostProfitableGame
-                      ? `${stats.mostProfitableGame.game} (${formatCurrencyFromCents(stats.mostProfitableGame.profit)})`
-                      : 'No daily data yet'}
-                  </strong>
-                </article>
+                  <article className="analytics-card">
+                    <span className="analytics-label">Most Profitable Game</span>
+                    <strong>
+                      {stats.mostProfitableGame
+                        ? `${stats.mostProfitableGame.game} (${formatCurrencyFromCents(stats.mostProfitableGame.profit)})`
+                        : 'No daily data yet'}
+                    </strong>
+                  </article>
 
-                <article className="analytics-card">
-                  <span className="analytics-label">Top Profit Player (24H)</span>
-                  <strong>
-                    {stats.mostProfitablePlayer
-                      ? `${stats.mostProfitablePlayer.player} (${formatCurrencyFromCents(stats.mostProfitablePlayer.profit)})`
-                      : 'No daily data yet'}
-                  </strong>
-                </article>
-              </div>
-            </div>
-
-            <aside className="analytics-side">
-              <div className="analytics-leaderboard">
-                <div className="analytics-leaderboard-header">
-                  <h3>Top 10 Most Profitable Players (24H)</h3>
+                  <article className="analytics-card">
+                    <span className="analytics-label">Top Profit Player (7D)</span>
+                    <strong>
+                      {stats.mostProfitablePlayer
+                        ? `${stats.mostProfitablePlayer.player} (${formatCurrencyFromCents(stats.mostProfitablePlayer.profit)})`
+                        : 'No daily data yet'}
+                    </strong>
+                  </article>
                 </div>
-
-                {stats.topPlayers.length ? (
-                  <ol className="analytics-leaderboard-list">
-                    {stats.topPlayers.map((entry) => (
-                      <li key={entry.player} className="analytics-leaderboard-row">
-                        <span className="analytics-rank">#{entry.rank}</span>
-                        <span className="analytics-player">{entry.player}</span>
-                        <span className="analytics-profit">{formatCurrencyFromCents(entry.profit)}</span>
-                      </li>
-                    ))}
-                  </ol>
-                ) : (
-                  <p className="analytics-status">No daily leaderboard data yet.</p>
-                )}
               </div>
-            </aside>
-          </div>
-        )}
-      </div>
-    </section>
+
+              <aside className="analytics-side">
+                <div className="analytics-leaderboard">
+                  <div className="analytics-leaderboard-header">
+                    <h3>Top 10 Most Profitable Players (7D)</h3>
+                  </div>
+
+                  {stats.topPlayers.length ? (
+                    <ol className="analytics-leaderboard-list">
+                      {stats.topPlayers.map((entry) => (
+                        <li key={entry.player} className="analytics-leaderboard-row">
+                          <span className="analytics-rank">#{entry.rank}</span>
+                          <span className="analytics-player">{entry.player}</span>
+                          <span className="analytics-profit">{formatCurrencyFromCents(entry.profit)}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="analytics-status">No daily leaderboard data yet.</p>
+                  )}
+                </div>
+              </aside>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
   )
 }
 

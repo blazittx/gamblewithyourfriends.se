@@ -1,5 +1,6 @@
 import './HeroBanner.css'
 import Button from '../common/Button'
+import AnalyticsSection from '../AnalyticsSection/AnalyticsSection'
 import { openSteamStore } from '../../utils/steam'
 
 const HeroBanner = () => {
@@ -27,6 +28,8 @@ const HeroBanner = () => {
           </div>
         </div>
       </div>
+
+      <AnalyticsSection />
     </section>
   )
 }

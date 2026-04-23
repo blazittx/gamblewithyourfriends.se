@@ -1,0 +1,88 @@
+.bet-feed {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: min(340px, calc(100vw - 32px));
+  z-index: 1200;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.bet-feed-toast {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left-width: 4px;
+  border-radius: 999px;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  color: #fff;
+  margin-bottom: 8px;
+  max-height: 52px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 320ms ease,
+    transform 320ms ease,
+    max-height 320ms ease,
+    margin-bottom 320ms ease,
+    padding-top 320ms ease,
+    padding-bottom 320ms ease;
+  animation: bet-feed-enter 260ms ease both;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  will-change: transform, opacity, max-height;
+}
+
+.bet-feed-toast.is-win {
+  border-left-color: rgba(29, 195, 87, 0.95);
+}
+
+.bet-feed-toast.is-loss {
+  border-left-color: rgba(229, 77, 66, 0.95);
+}
+
+.bet-feed-line {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bet-feed-line strong {
+  color: #fff;
+}
+
+.bet-feed-toast.is-leaving {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  max-height: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+@keyframes bet-feed-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .bet-feed {
+    top: 10px;
+    left: 10px;
+    width: min(320px, calc(100vw - 20px));
+  }
+}
