@@ -45,6 +45,7 @@
   font-size: clamp(1.05rem, 1.4vw, 1.35rem);
   line-height: 1.35;
   overflow-wrap: anywhere;
+  height: -webkit-fill-available;
 }
 
 .analytics-label {
@@ -68,7 +69,11 @@
 }
 
 .analytics-card--emphasis {
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.05)
+  );
   border-color: rgba(255, 255, 255, 0.26);
 }
 
