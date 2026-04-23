@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './AnalyticsSection.css'
 
 const API_URL = 'https://api.diabolical.studio/rest-api/gameAnalytics'
-const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000
+const DAY_IN_MS = 24 * 60 * 60 * 1000
 const PAGE_SIZE = 500
 const MAX_PAGES = 40
 
@@ -39,18 +39,18 @@ const formatCurrencyFromCents = (cents) => {
 }
 
 const calculateStats = (rows) => {
-  const weekThreshold = Date.now() - WEEK_IN_MS
-  const weeklyRows = rows.filter((row) => new Date(row.created_at).getTime() >= weekThreshold)
-  const betsLast7Days = weeklyRows.length
-  const weeklyWins = weeklyRows.filter((row) => row.is_win === 1).length
-  const averageWinRate = betsLast7Days ? (weeklyWins / betsLast7Days) * 100 : 0
+  const dayThreshold = Date.now() - DAY_IN_MS
+  const dailyRows = rows.filter((row) => new Date(row.created_at).getTime() >= dayThreshold)
+  const betsLast24Hours = dailyRows.length
+  const dailyWins = dailyRows.filter((row) => row.is_win === 1).length
+  const averageWinRate = betsLast24Hours ? (dailyWins / betsLast24Hours) * 100 : 0
 
-  const playerProfits = weeklyRows.reduce((acc, row) => {
+  const playerProfits = dailyRows.reduce((acc, row) => {
     const player = row.player_name || 'Unknown'
     acc[player] = (acc[player] || 0n) + parseMoneyToCents(row.profit_loss)
     return acc
   }, {})
-  const gameProfits = weeklyRows.reduce((acc, row) => {
+  const gameProfits = dailyRows.reduce((acc, row) => {
     const game = row.sub_game_name || 'Unknown'
     acc[game] = (acc[game] || 0n) + parseMoneyToCents(row.profit_loss)
     return acc
@@ -71,7 +71,7 @@ const calculateStats = (rows) => {
   }
 
   let biggestSingleWin = null
-  for (const row of weeklyRows) {
+  for (const row of dailyRows) {
     const winAmount = parseMoneyToCents(row.win_amount)
     if (!biggestSingleWin || winAmount > biggestSingleWin.amount) {
       biggestSingleWin = {
@@ -83,7 +83,7 @@ const calculateStats = (rows) => {
   }
 
   return {
-    betsLast7Days,
+    betsLast24Hours,
     averageWinRate,
     mostProfitablePlayer,
     mostProfitableGame,
@@ -159,8 +159,8 @@ const AnalyticsSection = () => {
         ) : (
           <div className="analytics-grid analytics-grid--bento">
             <article className="analytics-card analytics-card--hero">
-              <span className="analytics-label">Bets in Last 7 Days</span>
-              <strong>{formatNumber(stats.betsLast7Days)}</strong>
+              <span className="analytics-label">Bets in Last 24 Hours</span>
+              <strong>{formatNumber(stats.betsLast24Hours)}</strong>
             </article>
 
             <article className="analytics-card">
@@ -173,25 +173,25 @@ const AnalyticsSection = () => {
               <strong>
                 {stats.mostProfitableGame
                   ? `${stats.mostProfitableGame.game} (${formatCurrencyFromCents(stats.mostProfitableGame.profit)})`
-                  : 'No weekly data yet'}
+                  : 'No daily data yet'}
               </strong>
             </article>
 
             <article className="analytics-card analytics-card--wide">
-              <span className="analytics-label">Biggest Single Win (Last 7 Days)</span>
+              <span className="analytics-label">Biggest Single Win (Last 24 Hours)</span>
               <strong>
                 {stats.biggestSingleWin
                   ? `${formatCurrencyFromCents(stats.biggestSingleWin.amount)} by ${stats.biggestSingleWin.player} in ${stats.biggestSingleWin.game}`
-                  : 'No weekly data yet'}
+                  : 'No daily data yet'}
               </strong>
             </article>
 
             <article className="analytics-card analytics-card--wide">
-              <span className="analytics-label">Most Profitable Player This Week</span>
+              <span className="analytics-label">Most Profitable Player Today</span>
               <strong>
                 {stats.mostProfitablePlayer
                   ? `${stats.mostProfitablePlayer.player} (${formatCurrencyFromCents(stats.mostProfitablePlayer.profit)})`
-                  : 'No weekly data yet'}
+                  : 'No daily data yet'}
               </strong>
             </article>
           </div>
