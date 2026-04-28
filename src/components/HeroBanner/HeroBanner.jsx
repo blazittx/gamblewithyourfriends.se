@@ -2,6 +2,7 @@ import './HeroBanner.css'
 import Button from '../common/Button'
 import AnalyticsSection from '../AnalyticsSection/AnalyticsSection'
 import { openSteamStore } from '../../utils/steam'
+import { featureFlags } from '../../config/featureFlags'
 
 const HeroBanner = () => {
   const heroLogoSrc = '/GWYF_LOGO_1280x720.png'
@@ -29,7 +30,7 @@ const HeroBanner = () => {
         </div>
       </div>
 
-      <AnalyticsSection />
+      {featureFlags.analytics && <AnalyticsSection />}
     </section>
   )
 }

@@ -9,6 +9,7 @@ import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
 import PrivacyPolicy from './components/pages/PrivacyPolicy'
 import TermsOfService from './components/pages/TermsOfService'
+import { featureFlags } from './config/featureFlags'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
@@ -132,7 +133,7 @@ function App() {
       </Helmet>
 
       <div className="App">
-        <BetFeed />
+        {featureFlags.liveFeed && <BetFeed />}
         <Navigation />
         <HeroBanner />
         <Footer />
