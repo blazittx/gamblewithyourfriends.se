@@ -59,6 +59,7 @@ const Footer = () => {
             <div className="footer-column">
               <h4 className="footer-heading">Support</h4>
               <ul>
+                <li><a href="#game-privacy-policy-v1">Game Privacy Policy v1</a></li>
                 <li><a href="#privacy-policy">Privacy Policy</a></li>
                 <li><a href="#terms-of-service">Terms of Service</a></li>
               </ul>
@@ -89,6 +90,8 @@ const Footer = () => {
               &copy; {currentYear} Gamble With Your Friends. Some rights reserved.
             </p>
             <div className="footer-legal">
+              <a href="#game-privacy-policy-v1">Game Privacy v1</a>
+              <span className="footer-separator">•</span>
               <a href="#privacy-policy">Privacy</a>
               <span className="footer-separator">•</span>
               <a href="#terms-of-service">Terms</a>

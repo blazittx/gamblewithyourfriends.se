@@ -8,6 +8,7 @@ import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
 import CookieConsent from './components/common/CookieConsent'
 import PrivacyPolicy from './components/pages/PrivacyPolicy'
+import GamePrivacyPolicyV1 from './components/pages/GamePrivacyPolicyV1'
 import TermsOfService from './components/pages/TermsOfService'
 import { featureFlags } from './config/featureFlags'
 
@@ -17,7 +18,7 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
-      if (hash === 'privacy-policy' || hash === 'terms-of-service') {
+      if (hash === 'privacy-policy' || hash === 'game-privacy-policy-v1' || hash === 'terms-of-service') {
         setCurrentPage(hash)
       } else {
         setCurrentPage('home')
@@ -34,6 +35,10 @@ function App() {
 
   if (currentPage === 'privacy-policy') {
     return <PrivacyPolicy />
+  }
+
+  if (currentPage === 'game-privacy-policy-v1') {
+    return <GamePrivacyPolicyV1 />
   }
 
   if (currentPage === 'terms-of-service') {
