@@ -49,7 +49,31 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.28) transparent;
+}
+
+.faq-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.faq-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+
+.faq-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.26);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+
+.faq-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.36);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .faq-item {

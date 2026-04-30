@@ -3,7 +3,6 @@ import './FAQSection.css'
 
 const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState(null)
-  const discordSite = 'gwyf.se'
 
   const faqs = [
     {
@@ -63,14 +62,48 @@ const FAQSection = () => {
   }
 
   const renderAnswer = (text) => {
-    const parts = text.split(discordSite)
-    if (parts.length === 1) return text
+    const pattern = /(https?:\/\/[^\s)]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}|(?:[a-z0-9-]+\.)+[a-z]{2,})(?=[\s.,!?)]|$)/gi
+    const matches = [...text.matchAll(pattern)]
+    if (!matches.length) return text
 
-    return parts.flatMap((part, index) => (
-      index < parts.length - 1
-        ? [part, <a key={`gwyf-link-${index}`} href={`https://${discordSite}`} target="_blank" rel="noopener noreferrer">{discordSite}</a>]
-        : [part]
-    ))
+    const nodes = []
+    let lastIndex = 0
+
+    matches.forEach((match, index) => {
+      const value = match[0]
+      const start = match.index ?? 0
+
+      if (start > lastIndex) {
+        nodes.push(text.slice(lastIndex, start))
+      }
+
+      let href = value
+      const isEmail = value.includes('@')
+      if (isEmail) {
+        href = `mailto:${value}`
+      } else if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        href = `https://${value}`
+      }
+
+      nodes.push(
+        <a
+          key={`faq-link-${index}`}
+          href={href}
+          target={isEmail ? undefined : '_blank'}
+          rel={isEmail ? undefined : 'noopener noreferrer'}
+        >
+          {value}
+        </a>
+      )
+
+      lastIndex = start + value.length
+    })
+
+    if (lastIndex < text.length) {
+      nodes.push(text.slice(lastIndex))
+    }
+
+    return nodes
   }
 
   return (
