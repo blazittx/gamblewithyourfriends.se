@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import './App.css'
 import Navigation from './components/common/Navigation'
 import HeroBanner from './components/HeroBanner/HeroBanner'
+import FAQSection from './components/FAQSection/FAQSection'
 import BetFeed from './components/BetFeed/BetFeed'
 import Footer from './components/common/Footer'
 import BackToTop from './components/common/BackToTop'
@@ -141,6 +142,7 @@ function App() {
         {featureFlags.liveFeed && <BetFeed />}
         <Navigation />
         <HeroBanner />
+        <FAQSection />
         <Footer />
         <BackToTop />
         <CookieConsent />
